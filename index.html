@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AnythingLLM Chat</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 30px auto; padding: 10px; }
+    #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
+    #chat-box p { margin: 5px 0; }
+    input, button { padding: 8px; font-size: 16px; }
+    #input-box { width: 75%; }
+  </style>
+</head>
+<body>
+  <h2>Chat with AnythingLLM</h2>
+  <div id="chat-box"></div>
+  <input id="input-box" type="text" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      const inputEl = document.getElementById("input-box");
+      const chatBox = document.getElementById("chat-box");
+      const userText = inputEl.value.trim();
+      if (!userText) return;
+
+      chatBox.innerHTML += `<p><strong>You:</strong> ${userText}</p>`;
+      inputEl.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      const response = await fetch("http://localhost:3001/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: userText,
+          workspace: "default"   // 替換為你的 Workspace 名稱
+        })
+      });
+
+      const data = await response.json();
+      const reply = data.answer || "No response from model.";
+      chatBox.innerHTML += `<p><strong>AI:</strong> ${reply}</p>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
